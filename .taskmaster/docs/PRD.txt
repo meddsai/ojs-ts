@@ -1,0 +1,261 @@
+<context>
+# Overview  
+MOJS (Modern Open Journal System) is a migration of the existing Open Journal Systems (OJS) platform to modern web technologies. This migration will transform the current PHP-based OJS into a modern TypeScript-based application using the Titan Pomade stack, while preserving all existing functionality and data.
+
+# Migration Approach  
+## 1. In-Place Migration Strategy
+- **Frontend**: Gradually replace Smarty templates with React components while maintaining existing structure
+- **Backend**: Convert PHP classes to TypeScript incrementally within existing OJS directory structure
+- **Database**: Continue using existing PostgreSQL database, adding Prisma ORM layer
+- **Search**: Integrate MeiliSearch alongside existing search functionality
+- **Containerization**: Add Docker support for the existing application
+
+## 2. Direct Migration Path
+### Phase 1: TypeScript Integration
+- Add TypeScript configuration to existing project
+- Set up build process for TypeScript files
+- Create type definitions for existing PHP classes
+- Configure Babel/Webpack to handle both PHP and TypeScript
+
+### Phase 2: Frontend Modernization
+- Add React components alongside Smarty templates
+- Gradually replace jQuery with vanilla TypeScript
+- Implement responsive design updates in place
+- Maintain all existing URLs and routing
+
+### Phase 3: Backend Migration
+- Convert PHP classes to TypeScript one at a time
+- Maintain existing file structure and class hierarchy
+- Add type definitions for PHP classes
+- Implement compatibility layer for mixed PHP/TypeScript calls
+
+# User Experience  
+## User Personas
+1. **Authors**: Researchers submitting papers
+2. **Reviewers**: Experts evaluating submissions
+3. **Editors**: Managing the editorial process
+4. **Readers**: Accessing published content
+
+## Key User Flows
+1. Article submission and tracking
+2. Peer review process
+3. Editorial decision making
+4. Article publication
+5. Content discovery and access
+</context>
+
+<PRD>
+# Technical Migration Strategy  
+## In-Place Architecture Evolution
+1. **Frontend Migration**
+   - Add React components alongside existing Smarty templates
+   - Gradually replace jQuery with vanilla TypeScript
+   - Implement responsive design updates in place
+   - Maintain all existing URLs and routing
+
+2. **Backend Migration**
+   - Convert PHP classes to TypeScript one at a time
+   - Maintain existing file structure and class hierarchy
+   - Add type definitions for PHP classes
+   - Implement compatibility layer for mixed PHP/TypeScript calls
+
+3. **Database Layer**
+   - Keep existing database schema
+   - Add Prisma as an additional ORM layer
+   - Create TypeScript types from database schema
+   - Maintain backward compatibility with existing queries
+
+4. **Search Enhancement**
+   - Add MeiliSearch as a secondary search provider
+   - Implement dual search (existing + MeiliSearch)
+   - Gradually shift search functionality to MeiliSearch
+
+## Data Models (Migrated from OJS)
+- **Users & Roles**: Preserve existing user accounts and permissions
+- **Journals**: Migrate all journal configurations and settings
+- **Submissions**: Transfer all submission data and metadata
+- **Review Process**: Maintain existing review workflows and data
+- **Issues & Articles**: Preserve all published content and versions
+
+## API Strategy
+- **RESTful API**: Primary interface for CRUD operations
+- **Legacy API Compatibility**: Temporary compatibility layer for existing integrations
+- **WebSockets**: For real-time updates in editorial workflows
+- **Webhooks**: For external system integrations
+
+# Migration Roadmap  
+## Phase 1: TypeScript Integration
+1. **Development Environment**
+   - Add TypeScript configuration to existing project
+   - Set up build process for TypeScript files
+   - Create type definitions for core PHP classes
+   - Configure mixed PHP/TypeScript development
+
+2. **Database Layer**
+   - Generate Prisma schema from existing database
+   - Create TypeScript types from database schema
+   - Set up database connection with Prisma
+   - Implement data access layer with type safety
+
+3. **Authentication Layer**
+   - Add TypeScript types to authentication system
+   - Implement JWT alongside existing session handling
+   - Update role-based access control with TypeScript
+   - Maintain backward compatibility
+
+## Phase 2: Frontend Modernization
+1. **Public-Facing Components**
+   - Convert header/footer to React components
+   - Update article display with responsive design
+   - Enhance search interface with TypeScript
+   - Modernize user authentication flows
+
+2. **Author Workspace**
+   - Update submission forms with React
+   - Add real-time save and validation
+   - Improve file upload interface
+   - Maintain existing workflow steps
+
+3. **Editorial Tools**
+   - Modernize dashboard with interactive components
+   - Add keyboard shortcuts
+   - Implement real-time updates
+   - Preserve all existing functionality
+
+## Phase 3: Backend Migration
+1. **Core Services**
+   - Convert authentication service to TypeScript
+   - Migrate user management
+   - Update role-based permissions
+   - Add type-safe API layer
+
+2. **Business Logic**
+   - Convert submission workflow logic
+   - Migrate review process
+   - Update publication pipeline
+   - Add comprehensive type safety
+
+3. **Data Access**
+   - Replace direct SQL with Prisma
+   - Implement repository pattern
+   - Add data validation
+   - Optimize database queries
+
+## Phase 4: Optimization & Scaling
+1. **Performance**
+   - Implement server-side rendering
+   - Add caching layer
+   - Optimize asset delivery
+   - Database query optimization
+
+2. **Security**
+   - Security audit
+   - Rate limiting
+   - Input validation
+   - Dependency updates
+
+3. **Documentation**
+   - Update developer docs
+   - Create migration guides
+   - Document new APIs
+   - Create upgrade paths
+
+# Logical Dependency Chain
+1. **Foundation Layer**
+   - Authentication system
+   - Basic database schema
+   - Core API endpoints
+   - Basic UI components
+
+2. **Core Functionality**
+   - Journal management
+   - Submission workflow
+   - Basic review process
+   - Simple publication
+
+3. **Enhanced Features**
+   - Advanced search
+   - Custom theming
+   - Plugin system
+   - Integration with external services
+
+4. **Polish & Optimization**
+   - Performance improvements
+   - Accessibility enhancements
+   - Comprehensive documentation
+
+## Phase 5: Titan Pomade Stack Restructuring
+1. **Frontend Architecture**
+   - Refactor to Next.js application structure
+   - Implement App Router for better routing
+   - Set up server components for improved performance
+   - Optimize for static site generation
+
+2. **Backend Services**
+   - Restructure into NestJS microservices
+   - Implement GraphQL API layer
+   - Set up WebSocket for real-time features
+   - Add gRPC for internal service communication
+
+3. **Database Optimization**
+   - Refine Prisma schema for performance
+   - Implement database sharding if needed
+   - Set up read replicas for scalability
+   - Optimize indexes and query performance
+
+4. **DevOps & Infrastructure**
+   - Use Docker Compose for local development and small deployments
+   - Optional: Set up Kubernetes cluster for production scaling needs
+   - Implement Docker-based service discovery
+   - Configure container orchestration with Docker Swarm (optional)
+   - Set up comprehensive monitoring and logging with Docker-native tools
+
+5. **Developer Experience**
+   - Create project templates
+   - Set up automated testing framework
+   - Implement CI/CD pipelines
+   - Document architecture decisions and patterns
+
+# Risks and Mitigations  
+## Technical Risks
+1. **Data Migration Complexity**
+   - *Risk*: Challenges in migrating existing OJS data to the new schema
+   - *Mitigation*: Develop robust migration tools and test with sample data early
+
+2. **Performance at Scale**
+   - *Risk*: Performance degradation with large numbers of submissions or users
+   - *Mitigation*: Implement proper indexing, caching, and database optimization from the start
+
+3. **Browser Compatibility**
+   - *Risk*: Inconsistent behavior across different browsers
+   - *Mitigation*: Use modern frameworks with good cross-browser support and test early
+
+## Project Risks
+1. **Scope Creep**
+   - *Risk*: Feature creep could delay MVP delivery
+   - *Mitigation*: Strict adherence to the defined MVP scope before adding enhancements
+
+2. **Learning Curve**
+   - *Risk*: Team members may need time to learn the Titan Pomade stack
+   - *Mitigation*: Provide training and pair programming sessions
+
+3. **Community Adoption**
+   - *Risk*: Existing OJS users may be hesitant to migrate
+   - *Mitigation*: Focus on clear upgrade paths and backward compatibility
+
+# Appendix  
+## Research Findings
+- The Titan Pomade stack was chosen for its developer experience, type safety, and performance characteristics
+- Analysis of existing OJS pain points informed the architecture decisions
+- Modern web standards and accessibility requirements have been incorporated into the design
+
+## Technical Specifications
+- **Frontend Framework**: Next.js 14 with App Router
+- **Backend Framework**: NestJS
+- **Database**: PostgreSQL 16+
+- **ORM**: Prisma
+- **Search**: MeiliSearch
+- **Containerization**: Docker with Docker Compose
+- **CI/CD**: GitHub Actions
+- **Hosting**: Cloud-agnostic design (compatible with major cloud providers)
+</PRD>
