@@ -1,8 +1,11 @@
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 import Vue from '@vitejs/plugin-vue';
 import path from 'path';
 import copy from 'rollup-plugin-copy';
 import i18nExtractKeys from './lib/pkp/tools/i18nExtractKeys.vite.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({mode}) => {
 	// its very unclear how the plugin-vue is handling inProduction option
@@ -62,10 +65,13 @@ export default defineConfig(({mode}) => {
 		publicDir: false,
 		resolve: {
 			alias: {
-				'@': path.resolve(__dirname, 'lib/ui-library/src'),
-				// use vue version with template compiler
+				'@': path.resolve(__dirname, 'lib/pkp/js'),
+				'@/components': path.resolve(__dirname, 'lib/pkp/js/components'),
+				'@/mixins': path.resolve(__dirname, 'lib/pkp/js/mixins'),
+				'@/utils': path.resolve(__dirname, 'lib/pkp/js/utils'),
 				vue: 'vue/dist/vue.esm-bundler.js',
 			},
+			extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
 			// https://github.com/vitejs/vite/discussions/15906
 			dedupe: [
 				'@headlessui/vue',

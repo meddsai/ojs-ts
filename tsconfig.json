@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["lib/pkp/js/*", "js/*"],
+      "@/components/*": ["lib/pkp/js/components/*"],
+      "@/mixins/*": ["lib/pkp/js/mixins/*"],
+      "@/utils/*": ["lib/pkp/js/utils/*"]
+    },
+    "types": ["vite/client", "@types/node"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+}
