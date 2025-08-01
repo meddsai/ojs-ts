@@ -1,0 +1,150 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup TypeScript Development Environment",
+        "description": "Configure TypeScript in the existing OJS project to enable gradual migration from PHP to TypeScript while maintaining compatibility with existing codebase.",
+        "details": "1. Install TypeScript and required dependencies:\n```bash\nnpm init -y\nnpm install typescript ts-node @types/node --save-dev\n```\n2. Create tsconfig.json with appropriate configuration:\n```json\n{\n  \"compilerOptions\": {\n    \"target\": \"ES2020\",\n    \"module\": \"commonjs\",\n    \"esModuleInterop\": true,\n    \"strict\": true,\n    \"outDir\": \"./dist\",\n    \"rootDir\": \"./src\",\n    \"declaration\": true,\n    \"jsx\": \"react-jsx\"\n  },\n  \"include\": [\"src/**/*\"],\n  \"exclude\": [\"node_modules\"]\n}\n```\n3. Set up Babel/Webpack for mixed PHP/TypeScript environment:\n```bash\nnpm install webpack webpack-cli babel-loader @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react --save-dev\n```\n4. Create webpack.config.js for handling both PHP and TypeScript files\n5. Set up build scripts in package.json\n6. Create initial type definitions for core PHP classes\n7. Configure development workflow for mixed PHP/TypeScript development",
+        "testStrategy": "1. Verify TypeScript compilation works without errors\n2. Test the build process to ensure it correctly processes TypeScript files\n3. Validate that PHP and TypeScript can coexist in the project\n4. Create a simple TypeScript component and ensure it can be imported and used in the existing PHP application\n5. Run automated tests to verify the development environment is correctly set up",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implement Prisma ORM Layer",
+        "description": "Generate Prisma schema from the existing PostgreSQL database, create TypeScript types, and implement a data access layer while maintaining backward compatibility with existing queries.",
+        "details": "1. Install Prisma and related dependencies:\n```bash\nnpm install prisma @prisma/client --save-dev\n```\n2. Initialize Prisma in the project:\n```bash\nnpx prisma init\n```\n3. Configure database connection in .env file to connect to existing PostgreSQL database\n4. Generate Prisma schema from existing database:\n```bash\nnpx prisma db pull\n```\n5. Generate TypeScript types from the Prisma schema:\n```bash\nnpx prisma generate\n```\n6. Create a database service class to handle database connections:\n```typescript\n// src/services/database.service.ts\nimport { PrismaClient } from '@prisma/client';\n\nexport class DatabaseService {\n  private static instance: DatabaseService;\n  private prisma: PrismaClient;\n\n  private constructor() {\n    this.prisma = new PrismaClient();\n  }\n\n  public static getInstance(): DatabaseService {\n    if (!DatabaseService.instance) {\n      DatabaseService.instance = new DatabaseService();\n    }\n    return DatabaseService.instance;\n  }\n\n  public getPrisma(): PrismaClient {\n    return this.prisma;\n  }\n}\n```\n7. Implement repository pattern for data access with type safety\n8. Create compatibility layer to ensure existing PHP code can still access the database",
+        "testStrategy": "1. Write unit tests for the database service and repositories\n2. Test database connections and basic CRUD operations using Prisma\n3. Verify that existing PHP code can still access the database through the compatibility layer\n4. Test performance of Prisma queries compared to existing queries\n5. Validate type safety by intentionally introducing type errors and ensuring they're caught at compile time",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Modernize Authentication System",
+        "description": "Update the authentication system to use TypeScript and implement JWT alongside existing session handling while maintaining backward compatibility.",
+        "details": "1. Create TypeScript interfaces for user and authentication models:\n```typescript\n// src/types/auth.ts\nexport interface User {\n  id: number;\n  username: string;\n  email: string;\n  roles: Role[];\n}\n\nexport interface Role {\n  id: number;\n  name: string;\n  permissions: string[];\n}\n```\n2. Implement JWT authentication service:\n```typescript\n// src/services/auth.service.ts\nimport jwt from 'jsonwebtoken';\nimport { User } from '../types/auth';\n\nexport class AuthService {\n  private readonly JWT_SECRET = process.env.JWT_SECRET || 'default-secret';\n\n  generateToken(user: User): string {\n    return jwt.sign({ id: user.id, roles: user.roles.map(r => r.name) }, this.JWT_SECRET, {\n      expiresIn: '24h'\n    });\n  }\n\n  verifyToken(token: string): any {\n    return jwt.verify(token, this.JWT_SECRET);\n  }\n}\n```\n3. Create middleware for JWT authentication\n4. Implement compatibility layer to work alongside existing session-based authentication\n5. Update role-based access control with TypeScript types\n6. Create authentication endpoints for the new JWT system\n7. Implement secure token storage and refresh mechanism",
+        "testStrategy": "1. Write unit tests for JWT token generation and verification\n2. Test authentication flows with both JWT and session-based authentication\n3. Verify role-based access control works correctly\n4. Test token expiration and refresh mechanisms\n5. Perform security testing to ensure authentication cannot be bypassed\n6. Test backward compatibility with existing authentication system",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Convert Core Public-Facing Components to React",
+        "description": "Migrate header, footer, and article display components from Smarty templates to React components with responsive design while maintaining the existing URL structure.",
+        "details": "1. Install React and related dependencies:\n```bash\nnpm install react react-dom @types/react @types/react-dom\n```\n2. Create a component mounting system to replace Smarty templates with React components:\n```typescript\n// src/utils/componentMount.ts\nimport React from 'react';\nimport ReactDOM from 'react-dom';\n\nexport function mountComponent(Component: React.ComponentType<any>, elementId: string, props: any = {}) {\n  const element = document.getElementById(elementId);\n  if (element) {\n    ReactDOM.render(React.createElement(Component, props), element);\n    return true;\n  }\n  return false;\n}\n```\n3. Create React components for header and footer:\n```typescript\n// src/components/Header.tsx\nimport React from 'react';\n\ninterface HeaderProps {\n  siteName: string;\n  navigation: Array<{title: string, url: string}>;\n}\n\nexport const Header: React.FC<HeaderProps> = ({ siteName, navigation }) => {\n  return (\n    <header className=\"site-header\">\n      <div className=\"container\">\n        <h1>{siteName}</h1>\n        <nav>\n          <ul>\n            {navigation.map((item, index) => (\n              <li key={index}>\n                <a href={item.url}>{item.title}</a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      </div>\n    </header>\n  );\n};\n```\n4. Create article display component with responsive design\n5. Implement a system to pass data from PHP to React components\n6. Update the existing templates to include mounting points for React components\n7. Ensure all components are responsive and follow modern design principles",
+        "testStrategy": "1. Write unit tests for React components using Jest and React Testing Library\n2. Test responsive design across different screen sizes\n3. Verify that components render correctly with different data inputs\n4. Test integration with existing PHP code\n5. Perform accessibility testing to ensure components meet WCAG standards\n6. Test performance to ensure components load quickly",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Author Workspace React Components",
+        "description": "Update submission forms and author workspace with React components, adding real-time save functionality and improved file upload interface while maintaining the existing workflow steps.",
+        "details": "1. Create React components for submission forms:\n```typescript\n// src/components/SubmissionForm.tsx\nimport React, { useState, useEffect } from 'react';\nimport { useForm } from 'react-hook-form';\n\ninterface SubmissionFormProps {\n  initialData?: any;\n  onSave: (data: any) => Promise<void>;\n}\n\nexport const SubmissionForm: React.FC<SubmissionFormProps> = ({ initialData, onSave }) => {\n  const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: initialData });\n  const [saving, setSaving] = useState(false);\n  const [lastSaved, setLastSaved] = useState<Date | null>(null);\n\n  const onSubmit = async (data: any) => {\n    setSaving(true);\n    try {\n      await onSave(data);\n      setLastSaved(new Date());\n    } finally {\n      setSaving(false);\n    }\n  };\n\n  // Auto-save functionality\n  useEffect(() => {\n    const interval = setInterval(() => {\n      handleSubmit(onSubmit)();\n    }, 60000); // Auto-save every minute\n    return () => clearInterval(interval);\n  }, []);\n\n  return (\n    <form onSubmit={handleSubmit(onSubmit)}>\n      {/* Form fields */}\n      <div className=\"form-status\">\n        {saving && <span>Saving...</span>}\n        {lastSaved && <span>Last saved: {lastSaved.toLocaleTimeString()}</span>}\n      </div>\n      <button type=\"submit\" disabled={saving}>Save</button>\n    </form>\n  );\n};\n```\n2. Implement improved file upload component with drag-and-drop support\n3. Create real-time validation for submission forms\n4. Implement auto-save functionality to prevent data loss\n5. Create progress tracking for multi-step submission process\n6. Ensure all components maintain compatibility with existing workflow steps\n7. Add loading states and error handling for all user interactions",
+        "testStrategy": "1. Write unit tests for all React components\n2. Test form validation with various input scenarios\n3. Test file upload functionality with different file types and sizes\n4. Verify auto-save functionality works correctly\n5. Test the entire submission workflow end-to-end\n6. Perform usability testing with authors to ensure the interface is intuitive\n7. Test error handling and recovery scenarios",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Modernize Editorial Dashboard with React",
+        "description": "Update the editorial dashboard with interactive React components, adding keyboard shortcuts and real-time updates while preserving all existing functionality.",
+        "details": "1. Create a dashboard layout component:\n```typescript\n// src/components/editorial/Dashboard.tsx\nimport React, { useEffect } from 'react';\nimport { SubmissionsList } from './SubmissionsList';\nimport { ReviewQueue } from './ReviewQueue';\nimport { Statistics } from './Statistics';\n\nexport const Dashboard: React.FC = () => {\n  // Set up keyboard shortcuts\n  useEffect(() => {\n    const handleKeyDown = (e: KeyboardEvent) => {\n      // Implement keyboard shortcuts\n      if (e.ctrlKey && e.key === 'n') {\n        // New submission shortcut\n        e.preventDefault();\n        window.location.href = '/submission/new';\n      }\n      // Add more shortcuts as needed\n    };\n    \n    window.addEventListener('keydown', handleKeyDown);\n    return () => window.removeEventListener('keydown', handleKeyDown);\n  }, []);\n\n  return (\n    <div className=\"editorial-dashboard\">\n      <div className=\"dashboard-header\">\n        <h1>Editorial Dashboard</h1>\n        <div className=\"actions\">\n          {/* Action buttons */}\n        </div>\n      </div>\n      <div className=\"dashboard-grid\">\n        <SubmissionsList />\n        <ReviewQueue />\n        <Statistics />\n      </div>\n    </div>\n  );\n};\n```\n2. Implement WebSocket connection for real-time updates:\n```typescript\n// src/services/websocket.service.ts\nexport class WebSocketService {\n  private socket: WebSocket | null = null;\n  private listeners: Map<string, Function[]> = new Map();\n\n  connect(url: string): void {\n    this.socket = new WebSocket(url);\n    \n    this.socket.onmessage = (event) => {\n      const data = JSON.parse(event.data);\n      const listeners = this.listeners.get(data.type) || [];\n      listeners.forEach(listener => listener(data.payload));\n    };\n  }\n\n  on(event: string, callback: Function): void {\n    if (!this.listeners.has(event)) {\n      this.listeners.set(event, []);\n    }\n    this.listeners.get(event)?.push(callback);\n  }\n\n  off(event: string, callback: Function): void {\n    const listeners = this.listeners.get(event) || [];\n    this.listeners.set(event, listeners.filter(listener => listener !== callback));\n  }\n\n  send(type: string, payload: any): void {\n    if (this.socket && this.socket.readyState === WebSocket.OPEN) {\n      this.socket.send(JSON.stringify({ type, payload }));\n    }\n  }\n}\n```\n3. Create interactive components for managing submissions\n4. Implement drag-and-drop functionality for workflow management\n5. Add keyboard shortcuts for common actions\n6. Create data visualization components for editorial statistics\n7. Ensure all existing functionality is preserved and enhanced",
+        "testStrategy": "1. Write unit tests for all dashboard components\n2. Test WebSocket functionality for real-time updates\n3. Verify keyboard shortcuts work correctly\n4. Test drag-and-drop functionality for workflow management\n5. Perform end-to-end testing of editorial workflows\n6. Test performance with large datasets\n7. Conduct usability testing with editors to ensure the interface is intuitive",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          3,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement MeiliSearch Integration",
+        "description": "Add MeiliSearch as a secondary search provider alongside the existing search functionality, with a gradual migration path to fully transition to MeiliSearch.",
+        "details": "1. Install MeiliSearch client:\n```bash\nnpm install meilisearch\n```\n2. Create a search service that supports both existing search and MeiliSearch:\n```typescript\n// src/services/search.service.ts\nimport { MeiliSearch } from 'meilisearch';\n\nexport class SearchService {\n  private meili: MeiliSearch;\n  private useExistingSearch: boolean = true;\n  \n  constructor() {\n    this.meili = new MeiliSearch({\n      host: process.env.MEILI_HOST || 'http://localhost:7700',\n      apiKey: process.env.MEILI_API_KEY || ''\n    });\n  }\n  \n  async search(query: string, options: any = {}): Promise<any> {\n    // Dual search implementation\n    const [meiliResults, existingResults] = await Promise.all([\n      this.searchMeili(query, options),\n      this.useExistingSearch ? this.searchExisting(query, options) : Promise.resolve([])\n    ]);\n    \n    // Compare results and gradually transition to MeiliSearch\n    return this.useExistingSearch ? existingResults : meiliResults;\n  }\n  \n  private async searchMeili(query: string, options: any): Promise<any> {\n    const index = this.meili.index(options.index || 'articles');\n    return await index.search(query, options);\n  }\n  \n  private async searchExisting(query: string, options: any): Promise<any> {\n    // Call existing search functionality\n    // This would be an API call or direct database query\n    return [];\n  }\n  \n  // Method to index content in MeiliSearch\n  async indexContent(index: string, documents: any[]): Promise<void> {\n    const meiliIndex = this.meili.index(index);\n    await meiliIndex.addDocuments(documents);\n  }\n}\n```\n3. Create indexing scripts to populate MeiliSearch with existing data\n4. Implement search UI components that work with both search providers\n5. Create a configuration system to control which search provider is used\n6. Implement search result comparison for validation\n7. Add monitoring to track search performance and accuracy",
+        "testStrategy": "1. Test MeiliSearch indexing with sample data\n2. Compare search results between existing search and MeiliSearch\n3. Measure search performance metrics (speed, relevance)\n4. Test search UI components with both search providers\n5. Verify that the transition between search providers is seamless\n6. Test search with various query types and edge cases\n7. Perform load testing to ensure search performance at scale",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Convert Core Business Logic to TypeScript",
+        "description": "Migrate submission workflow logic, review process, and publication pipeline from PHP to TypeScript with comprehensive type safety while maintaining backward compatibility.",
+        "details": "1. Create TypeScript interfaces for core domain models:\n```typescript\n// src/types/submission.ts\nexport interface Submission {\n  id: number;\n  title: string;\n  abstract: string;\n  authorId: number;\n  status: SubmissionStatus;\n  createdAt: Date;\n  updatedAt: Date;\n}\n\nexport enum SubmissionStatus {\n  DRAFT = 'draft',\n  SUBMITTED = 'submitted',\n  UNDER_REVIEW = 'under_review',\n  ACCEPTED = 'accepted',\n  REJECTED = 'rejected',\n  PUBLISHED = 'published'\n}\n\n// src/types/review.ts\nexport interface Review {\n  id: number;\n  submissionId: number;\n  reviewerId: number;\n  comments: string;\n  recommendation: ReviewRecommendation;\n  createdAt: Date;\n  updatedAt: Date;\n}\n\nexport enum ReviewRecommendation {\n  ACCEPT = 'accept',\n  MINOR_REVISIONS = 'minor_revisions',\n  MAJOR_REVISIONS = 'major_revisions',\n  REJECT = 'reject'\n}\n```\n2. Implement submission workflow service:\n```typescript\n// src/services/submission.service.ts\nimport { Submission, SubmissionStatus } from '../types/submission';\nimport { DatabaseService } from './database.service';\n\nexport class SubmissionService {\n  private db = DatabaseService.getInstance().getPrisma();\n  \n  async createSubmission(data: Omit<Submission, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<Submission> {\n    return this.db.submission.create({\n      data: {\n        ...data,\n        status: SubmissionStatus.DRAFT\n      }\n    });\n  }\n  \n  async updateSubmission(id: number, data: Partial<Submission>): Promise<Submission> {\n    return this.db.submission.update({\n      where: { id },\n      data\n    });\n  }\n  \n  async submitForReview(id: number): Promise<Submission> {\n    return this.db.submission.update({\n      where: { id },\n      data: { status: SubmissionStatus.SUBMITTED }\n    });\n  }\n  \n  // Additional methods for the submission workflow\n}\n```\n3. Implement review process service\n4. Create publication pipeline service\n5. Implement compatibility layer for PHP code to call TypeScript services\n6. Add comprehensive validation and error handling\n7. Create unit tests for all business logic",
+        "testStrategy": "1. Write comprehensive unit tests for all business logic\n2. Test the entire submission workflow end-to-end\n3. Verify that the review process works correctly\n4. Test the publication pipeline with various scenarios\n5. Verify backward compatibility with existing PHP code\n6. Test error handling and edge cases\n7. Perform integration testing with the frontend components",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Implement RESTful API Layer",
+        "description": "Create a comprehensive RESTful API for CRUD operations with TypeScript, including a compatibility layer for existing integrations and documentation.",
+        "details": "1. Install Express and related dependencies:\n```bash\nnpm install express @types/express cors @types/cors helmet\n```\n2. Create API router and controller structure:\n```typescript\n// src/api/controllers/submission.controller.ts\nimport { Request, Response } from 'express';\nimport { SubmissionService } from '../../services/submission.service';\n\nexport class SubmissionController {\n  private submissionService = new SubmissionService();\n  \n  async getSubmissions(req: Request, res: Response): Promise<void> {\n    try {\n      const submissions = await this.submissionService.getSubmissions(req.query);\n      res.json(submissions);\n    } catch (error) {\n      res.status(500).json({ error: error.message });\n    }\n  }\n  \n  async getSubmission(req: Request, res: Response): Promise<void> {\n    try {\n      const submission = await this.submissionService.getSubmission(parseInt(req.params.id));\n      if (!submission) {\n        res.status(404).json({ error: 'Submission not found' });\n        return;\n      }\n      res.json(submission);\n    } catch (error) {\n      res.status(500).json({ error: error.message });\n    }\n  }\n  \n  // Additional CRUD methods\n}\n```\n3. Implement middleware for authentication and authorization\n4. Create API documentation using Swagger/OpenAPI\n5. Implement rate limiting and security measures\n6. Create compatibility layer for existing API integrations\n7. Implement WebSocket endpoints for real-time updates\n8. Add webhook support for external system integrations",
+        "testStrategy": "1. Write unit tests for all API endpoints\n2. Test API authentication and authorization\n3. Verify that all CRUD operations work correctly\n4. Test rate limiting and security measures\n5. Verify compatibility with existing integrations\n6. Test WebSocket functionality for real-time updates\n7. Perform load testing to ensure API performance at scale",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Setup Docker Containerization",
+        "description": "Add Docker support for the application with Docker Compose for local development and small deployments, including configuration for container orchestration and monitoring.",
+        "details": "1. Create Dockerfile for the application:\n```dockerfile\n# Dockerfile\nFROM node:18-alpine as builder\n\nWORKDIR /app\n\nCOPY package*.json ./\nRUN npm install\n\nCOPY . .\nRUN npm run build\n\nFROM php:8.1-apache\n\nWORKDIR /var/www/html\n\n# Install PHP extensions and dependencies\nRUN apt-get update && apt-get install -y \\\n    libpq-dev \\\n    && docker-php-ext-install pdo pdo_pgsql\n\n# Copy PHP files\nCOPY --from=builder /app/public /var/www/html\nCOPY --from=builder /app/dist /var/www/html/dist\n\n# Configure Apache\nRUN a2enmod rewrite\nCOPY docker/apache.conf /etc/apache2/sites-available/000-default.conf\n\nEXPOSE 80\n\nCMD [\"apache2-foreground\"]\n```\n2. Create Docker Compose configuration:\n```yaml\n# docker-compose.yml\nversion: '3.8'\n\nservices:\n  app:\n    build: .\n    ports:\n      - \"8080:80\"\n    volumes:\n      - ./:/var/www/html\n    depends_on:\n      - db\n      - search\n    environment:\n      - DATABASE_URL=postgresql://postgres:postgres@db:5432/ojs\n      - MEILI_HOST=http://search:7700\n\n  db:\n    image: postgres:16-alpine\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n    environment:\n      - POSTGRES_PASSWORD=postgres\n      - POSTGRES_USER=postgres\n      - POSTGRES_DB=ojs\n    ports:\n      - \"5432:5432\"\n\n  search:\n    image: getmeili/meilisearch:latest\n    volumes:\n      - meili_data:/data.ms\n    ports:\n      - \"7700:7700\"\n\nvolumes:\n  postgres_data:\n  meili_data:\n```\n3. Create development and production Docker Compose configurations\n4. Set up Docker-based service discovery\n5. Configure container orchestration with Docker Swarm (optional)\n6. Implement monitoring and logging with Docker-native tools\n7. Create deployment scripts for different environments",
+        "testStrategy": "1. Test Docker build process\n2. Verify that the application runs correctly in Docker containers\n3. Test Docker Compose setup for local development\n4. Verify database and search service connections\n5. Test container orchestration with Docker Swarm (if implemented)\n6. Verify monitoring and logging functionality\n7. Test deployment scripts in different environments",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          2,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-01T14:00:21.835Z",
+      "updated": "2025-08-01T14:00:21.835Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
